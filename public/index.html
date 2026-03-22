@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Werewolf Online</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        :root { --main-bg: #121212; --panel-bg: #1e1e1e; --accent: #e53935; --text: #e0e0e0; --input-bg: #2c2c2c; }
+        
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; background-color: #000; color: var(--text); height: 100vh; display: flex; justify-content: center; overflow: hidden; }
+
+        /* 全体コンテナ (PCでもスマホでも中央に配置) */
+        #app-container { width: 100%; max-width: 500px; background: var(--main-bg); height: 100%; display: flex; flex-direction: column; position: relative; border-left: 1px solid #333; border-right: 1px solid #333; }
+
+        /* ログイン画面 */
+        #login-area { padding: 50px 20px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
+        .login-card { background: var(--panel-bg); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); }
+        .login-card h1 { color: var(--accent); margin-bottom: 25px; font-size: 2em; letter-spacing: 2px; }
+        input[type="text"], input[type="number"] { width: 100%; padding: 12px 15px; margin: 10px 0; border-radius: 10px; border: 1px solid #444; background: var(--input-bg); color: white; font-size: 16px; }
+
+        /* ゲーム画面 */
+        #game-area { display: none; flex-direction: column; height: 100%; }
+
+        /* ヘッダー */
+        .header { background: var(--panel-bg); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
+        .header h3 { margin: 0; font-size: 1.1em; color: var(--accent); }
+
+        /* 役職バー */
+        #my-role-bar { background: #263238; color: #ffeb3b; padding: 10px; text-align: center; font-size: 0.9em; border-bottom: 1px solid #444; display: none; line-height: 1.4; }
+
+        /* タブ */
+        .tab-nav { display: flex; background: var(--panel-bg); border-bottom: 1px solid #333; }
+        .tab-btn { flex: 1; padding: 14px; border: none; background: none; color: #777; font-weight: bold; font-size: 0.9em; cursor: pointer; transition: 0.2s; }
+        .tab-btn.active { color: var(--accent); border-bottom: 3px solid var(--accent); }
+
+        /* 各セクション */
+        .content { flex-grow: 1; overflow-y: auto; display: none; padding-bottom: 80px; }
+        .content.active { display: block; }
+
+        /* チャット */
+        .chat-list { padding: 15px; display: flex; flex-direction: column; gap: 12px; }
+        .msg { display: flex; flex-direction: column; max-width: 85%; }
+        .msg.left { align-self: flex-start; }
+        .msg.right { align-self: flex-end; align-items: flex-end; }
+        .sender { font-size: 0.7em; margin-bottom: 3px; color: #aaa; font-weight: bold; }
+        .bubble { padding: 10px 15px; border-radius: 18px; font-size: 0.95em; word-wrap: break-word; line-height: 1.5; }
+        .left .bubble { background: #333; border-bottom-left-radius: 4px; }
+        .right .bubble { background: var(--accent); color: white; border-bottom-right-radius: 4px; }
+
+        /* 設定パネル */
+        .scroll-box { padding: 15px; }
+        .card { background: var(--panel-bg); border-radius: 15px; padding: 15px; margin-bottom: 15px; border: 1px solid #333; }
+        .card-title { font-size: 0.8em; color: #888; margin-bottom: 10px; font-weight: bold; text-transform: uppercase; }
+        .setting-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.9em; }
+        .setting-item input[type="number"] { width: 60px; margin: 0; text-align: center; padding: 5px; }
+
+        /* プレイヤーリスト */
+        .p-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #333; }
+        .p-item:last-child { border: none; }
+        .p-name { font-size: 0.95em; display: flex; align-items: center; gap: 8px; }
+        .gm-badge { background: #ffd700; color: #000; font-size: 0.65em; padding: 2px 5px; border-radius: 4px; font-weight: bold; }
+
+        /* 入力エリア */
+        .input-area { position: absolute; bottom: 0; left: 0; width: 100%; background: var(--panel-bg); padding: 12px; display: flex; gap: 10px; border-top: 1px solid #333; }
+        .input-area input { flex-grow: 1; border-radius: 20px; margin: 0; border: none; }
+        
+        /* ボタン */
+        .btn { border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn:active { opacity: 0.7; }
+        .btn-primary { background: var(--accent); color: white; padding: 10px 20px; }
+        .btn-sub { background: #444; color: #ccc; font-size: 0.75em; padding: 5px 10px; }
+        .btn-outline { background: none; border: 1px solid var(--accent); color: var(--accent); width: 100%; padding: 12px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        <div id="login-area">
+            <div class="login-card">
+                <h1>WEREWOLF</h1>
+                <input type="text" id="roomId" placeholder="ルームIDを入力">
+                <input type="text" id="playerName" placeholder="名前を入力">
+                <button class="btn btn-primary" onclick="joinRoom()" style="width: 100%; margin-top: 15px;">入室する</button>
+            </div>
+        </div>
+
+        <div id="game-area">
+            <div class="header">
+                <h3 id="display-room"></h3>
+                <button class="btn btn-sub" onclick="location.reload()">退室</button>
+            </div>
+
+            <div id="my-role-bar"></div>
+
+            <div class="tab-nav">
+                <button class="tab-btn active" id="tab-chat-btn" onclick="switchTab('chat')">チャット</button>
+                <button class="tab-btn" id="tab-set-btn" onclick="switchTab('settings')">参加者 / 設定</button>
+            </div>
+
+            <div id="sect-chat" class="content active">
+                <div class="chat-list" id="chat-box"></div>
+            </div>
+
+            <div id="sect-settings" class="content">
+                <div class="scroll-box">
+                    <div id="gm-only-area" style="display:none;">
+                        <div class="card">
+                            <div class="card-title">GM設定パネル</div>
+                            <div class="setting-item"><span>人狼</span><input type="number" id="s-wolf" value="1" onchange="updateSettings()"></div>
+                            <div class="setting-item"><span>狂人</span><input type="number" id="s-madman" value="0" onchange="updateSettings()"></div>
+                            <div class="setting-item"><span>占い師</span><input type="number" id="s-seer" value="1" onchange="updateSettings()"></div>
+                            <div class="setting-item"><span>狩人</span><input type="number" id="s-hunter" value="0" onchange="updateSettings()"></div>
+                            <div class="setting-item"><span>市民</span><input type="number" id="s-villager" value="2" onchange="updateSettings()"></div>
+                            <div class="setting-item" style="margin-top:10px; padding-top:10px; border-top:1px solid #333;">
+                                <span>狼・狂人の相互認識</span><input type="checkbox" id="s-know" onchange="updateSettings()">
+                            </div>
+                            <button class="btn btn-outline" onclick="startGame()">ゲーム開始</button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">プレイヤーリスト</div>
+                        <div id="player-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-area" id="footer-input">
+                <input type="text" id="chat-input" placeholder="メッセージを入力..." onkeypress="if(event.key === 'Enter') sendChat()">
+                <button class="btn btn-primary" onclick="sendChat()">送信</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+        let currentRoom = "", myName = "", isGM = false;
+
+        function getNameColor(name) {
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            return `hsl(${Math.abs(hash) % 360}, 65%, 70%)`;
+        }
+
+        function switchTab(target) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+            if(target === 'chat') {
+                document.getElementById('tab-chat-btn').classList.add('active');
+                document.getElementById('sect-chat').classList.add('active');
+                document.getElementById('footer-input').style.display = 'flex';
+            } else {
+                document.getElementById('tab-set-btn').classList.add('active');
+                document.getElementById('sect-settings').classList.add('active');
+                document.getElementById('footer-input').style.display = 'none';
+            }
+        }
+
+        function joinRoom() {
+            currentRoom = document.getElementById('roomId').value;
+            myName = document.getElementById('playerName').value;
+            if(!currentRoom || !myName) return alert("情報を入力してください");
+            socket.emit('join-room', { roomId: currentRoom, playerName: myName });
+            document.getElementById('login-area').style.display = 'none';
+            document.getElementById('game-area').style.display = 'flex';
+            document.getElementById('display-room').innerText = "ROOM: " + currentRoom;
+        }
+
+        function updateSettings() {
+            if(!isGM) return;
+            const settings = {
+                wolf: parseInt(document.getElementById('s-wolf').value) || 0,
+                madman: parseInt(document.getElementById('s-madman').value) || 0,
+                hunter: parseInt(document.getElementById('s-hunter').value) || 0,
+                seer: parseInt(document.getElementById('s-seer').value) || 0,
+                villager: parseInt(document.getElementById('s-villager').value) || 0,
+                knowEachOther: document.getElementById('s-know').checked
+            };
+            socket.emit('update-settings', { roomId: currentRoom, settings });
+        }
+
+        function startGame() {
+            if(confirm("役職を配布してゲームを開始しますか？")) socket.emit('start-game', { roomId: currentRoom });
+        }
+
+        function transferGM(id) {
+            if(confirm("GM権限を譲渡しますか？")) socket.emit('transfer-gm', { roomId: currentRoom, newGmId: id });
+        }
+
+        function sendChat() {
+            const input = document.getElementById('chat-input');
+            if(!input.value) return;
+            socket.emit('send-chat', { roomId: currentRoom, message: input.value, playerName: myName });
+            input.value = "";
+        }
+
+        socket.on('update-room', (data) => {
+            isGM = data.gmId === socket.id;
+            document.getElementById('gm-only-area').style.display = isGM ? 'block' : 'none';
+            if(!isGM) {
+                document.getElementById('s-wolf').value = data.settings.wolf;
+                document.getElementById('s-madman').value = data.settings.madman;
+                document.getElementById('s-seer').value = data.settings.seer;
+                document.getElementById('s-hunter').value = data.settings.hunter;
+                document.getElementById('s-villager').value = data.settings.villager;
+                document.getElementById('s-know').checked = data.settings.knowEachOther;
+            }
+            const list = document.getElementById('player-list');
+            list.innerHTML = "";
+            data.players.forEach(p => {
+                const item = document.createElement('div');
+                item.className = 'p-item';
+                const roleInfo = (isGM && p.role) ? `<span style="font-size:0.75em; color:#888;">[${p.role}]</span>` : "";
+                const gmTag = p.isGM ? `<span class="gm-badge">GM</span>` : "";
+                const tBtn = (isGM && !p.isGM) ? `<button class="btn btn-sub" onclick="transferGM('${p.id}')">譲渡</button>` : "";
+                item.innerHTML = `<div class="p-name">${gmTag}<span style="color:${getNameColor(p.name)}">${p.name}</span> ${roleInfo}</div>${tBtn}`;
+                list.appendChild(item);
+            });
+        });
+
+        socket.on('assign-role', (data) => {
+            const bar = document.getElementById('my-role-bar');
+            bar.style.display = 'block';
+            bar.innerHTML = `<strong>あなたの役職: ${data.role}</strong><br><span style="font-size:0.85em; opacity:0.8;">${data.info || ''}</span>`;
+        });
+
+        socket.on('receive-chat', (data) => {
+            const box = document.getElementById('chat-box');
+            const isMe = data.senderId === socket.id;
+            const div = document.createElement('div');
+            div.className = `msg ${isMe ? 'right' : 'left'}`;
+            const sender = isMe ? "" : `<span class="sender" style="color:${getNameColor(data.playerName)}">${data.playerName}</span>`;
+            div.innerHTML = `${sender}<div class="bubble">${data.message}</div>`;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+        });
+    </script>
+</body>
+</html>
