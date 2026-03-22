@@ -14,65 +14,80 @@
 
         /* ログイン */
         #login-area { padding: 20px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
-        .login-card { background: var(--panel-bg); padding: 20px; border-radius: 15px; }
+        .login-card { background: var(--panel-bg); padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
 
         /* ゲーム画面 */
         #game-area { display: none; flex-direction: column; height: 100%; }
 
-        /* ヘッダー（さらに薄く） */
-        .header { background: var(--panel-bg); padding: 5px 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; height: 35px; }
+        /* ヘッダー */
+        .header { background: var(--panel-bg); padding: 5px 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; height: 38px; }
         .header h3 { margin: 0; font-size: 0.9em; color: var(--accent); }
 
-        /* 役職バー（1行でコンパクトに） */
-        #my-role-bar { background: #263238; color: #ffeb3b; padding: 4px 10px; text-align: center; font-size: 0.85em; border-bottom: 1px solid #444; display: none; }
+        /* 役職バー */
+        #my-role-bar { background: #263238; color: #ffeb3b; padding: 5px 10px; text-align: center; font-size: 0.85em; border-bottom: 1px solid #444; display: none; }
 
-        /* タブ（高さを低く） */
-        .tab-nav { display: flex; background: var(--panel-bg); border-bottom: 1px solid #333; height: 40px; }
+        /* タブ */
+        .tab-nav { display: flex; background: var(--panel-bg); border-bottom: 1px solid #333; height: 42px; }
         .tab-btn { flex: 1; border: none; background: none; color: #777; font-weight: bold; font-size: 0.85em; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .tab-btn.active { color: var(--accent); border-bottom: 2px solid var(--accent); background: rgba(255,255,255,0.02); }
+        .tab-btn.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
 
-        /* 各セクション */
-        .content { flex-grow: 1; overflow-y: auto; display: none; padding-bottom: 60px; } /* 入力欄の高さを下げた分調整 */
+        /* コンテンツ */
+        .content { flex-grow: 1; overflow-y: auto; display: none; padding-bottom: 80px; } 
         .content.active { display: block; }
 
-        /* チャット（吹き出しの間隔を詰める） */
-        .chat-list { padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+        /* チャット */
+        .chat-list { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
         .msg { display: flex; flex-direction: column; max-width: 85%; }
         .msg.left { align-self: flex-start; }
         .msg.right { align-self: flex-end; align-items: flex-end; }
         .sender { font-size: 0.7em; margin-bottom: 1px; color: #aaa; }
-        .bubble { padding: 6px 12px; border-radius: 12px; font-size: 0.9em; word-wrap: break-word; line-height: 1.4; }
+        .bubble { padding: 8px 14px; border-radius: 14px; font-size: 0.95em; word-wrap: break-word; line-height: 1.4; }
         .left .bubble { background: #333; border-bottom-left-radius: 2px; }
         .right .bubble { background: var(--accent); color: white; border-bottom-right-radius: 2px; }
 
-        /* 設定・リスト */
+        /* 設定 */
         .scroll-box { padding: 10px; }
-        .card { background: var(--panel-bg); border-radius: 10px; padding: 10px; margin-bottom: 10px; border: 1px solid #333; }
-        .card-title { font-size: 0.75em; color: #888; margin-bottom: 8px; font-weight: bold; }
-        .setting-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; font-size: 0.85em; }
-        .setting-item input[type="number"] { width: 50px; padding: 3px; background: #2c2c2c; color: white; border: 1px solid #444; border-radius: 4px; }
+        .card { background: var(--panel-bg); border-radius: 12px; padding: 12px; margin-bottom: 12px; border: 1px solid #333; }
+        .card-title { font-size: 0.75em; color: #888; margin-bottom: 10px; font-weight: bold; text-transform: uppercase; }
+        .setting-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 0.9em; }
+        .setting-item input[type="number"] { width: 55px; padding: 4px; background: #2c2c2c; color: white; border: 1px solid #444; border-radius: 5px; text-align: center; }
 
-        /* 入力エリア（高さを抑える） */
-        .input-area { position: absolute; bottom: 0; left: 0; width: 100%; background: var(--panel-bg); padding: 8px 10px; display: flex; gap: 8px; border-top: 1px solid #333; align-items: center; }
-        .input-area input { flex-grow: 1; border-radius: 18px; padding: 8px 15px; border: none; background: var(--input-bg); color: white; font-size: 15px; height: 36px; }
+        /* フローティング入力エリア（少し上に浮かせた修正箇所） */
+        .input-area { 
+            position: absolute; 
+            bottom: 12px; /* 下端からの距離 */
+            left: 10px; 
+            right: 10px; 
+            width: calc(100% - 20px);
+            background: var(--panel-bg); 
+            padding: 6px 10px; 
+            display: flex; 
+            gap: 8px; 
+            border: 1px solid #444; 
+            border-radius: 25px; 
+            align-items: center; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6); 
+            z-index: 10;
+        }
+        .input-area input { flex-grow: 1; border: none; background: transparent; color: white; font-size: 16px; height: 38px; outline: none; }
         
         /* ボタン */
-        .btn { border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .btn-primary { background: var(--accent); color: white; padding: 0 15px; height: 36px; font-size: 0.9em; }
-        .btn-sub { background: #444; color: #ccc; font-size: 0.7em; padding: 3px 8px; }
-        .btn-outline { background: none; border: 1px solid var(--accent); color: var(--accent); width: 100%; padding: 10px; margin-top: 5px; font-size: 0.9em; }
+        .btn { border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-primary { background: var(--accent); color: white; padding: 0 18px; height: 34px; font-size: 0.9em; border-radius: 17px; }
+        .btn-sub { background: #444; color: #ccc; font-size: 0.7em; padding: 3px 8px; border-radius: 6px; }
+        .btn-outline { background: none; border: 1px solid var(--accent); color: var(--accent); width: 100%; padding: 12px; margin-top: 8px; font-size: 0.95em; }
 
-        .p-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #333; font-size: 0.9em; }
+        .p-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #222; font-size: 0.95em; }
     </style>
 </head>
 <body>
     <div id="app-container">
         <div id="login-area">
             <div class="login-card">
-                <h2 style="color:var(--accent); margin:0 0 15px 0;">WEREWOLF</h2>
+                <h1 style="color:var(--accent); margin:0 0 20px 0; letter-spacing: 3px;">WEREWOLF</h1>
                 <input type="text" id="roomId" placeholder="ルームID">
                 <input type="text" id="playerName" placeholder="名前">
-                <button class="btn btn-primary" onclick="joinRoom()" style="width: 100%; margin-top: 10px; height: 45px;">入室</button>
+                <button class="btn btn-primary" onclick="joinRoom()" style="width: 100%; margin-top: 15px; height: 48px; border-radius: 12px;">ゲームに入る</button>
             </div>
         </div>
 
@@ -97,9 +112,9 @@
                 <div class="scroll-box">
                     <div id="gm-only-area" style="display:none;">
                         <div class="card">
-                            <div class="card-title">GM設定</div>
-                            <div class="setting-item"><span>狼/狂/占/狩/市</span>
-                                <div style="display:flex; gap:2px;">
+                            <div class="card-title">GM管理パネル</div>
+                            <div class="setting-item"><span>人狼/狂人/占い/狩人/市民</span>
+                                <div style="display:flex; gap:3px;">
                                     <input type="number" id="s-wolf" value="1">
                                     <input type="number" id="s-madman" value="0">
                                     <input type="number" id="s-seer" value="1">
@@ -107,19 +122,19 @@
                                     <input type="number" id="s-villager" value="2">
                                 </div>
                             </div>
-                            <div class="setting-item"><span>狼・狂の相互認識</span><input type="checkbox" id="s-know" onchange="updateSettings()"></div>
-                            <button class="btn btn-outline" onclick="startGame()">ゲーム開始</button>
+                            <div class="setting-item"><span>狼・狂人の相互認識</span><input type="checkbox" id="s-know" onchange="updateSettings()"></div>
+                            <button class="btn btn-outline" onclick="startGame()">役職を配布する</button>
                         </div>
                     </div>
                     <div class="card">
-                        <div class="card-title">プレイヤー</div>
+                        <div class="card-title">参加プレイヤー</div>
                         <div id="player-list"></div>
                     </div>
                 </div>
             </div>
 
             <div class="input-area" id="footer-input">
-                <input type="text" id="chat-input" placeholder="メッセージ..." onkeypress="if(event.key === 'Enter') sendChat()">
+                <input type="text" id="chat-input" placeholder="メッセージを入力..." onkeypress="if(event.key === 'Enter') sendChat()">
                 <button class="btn btn-primary" onclick="sendChat()">送信</button>
             </div>
         </div>
@@ -132,7 +147,7 @@
         function getNameColor(name) {
             let hash = 0;
             for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
-            return `hsl(${Math.abs(hash) % 360}, 60%, 70%)`;
+            return `hsl(${Math.abs(hash) % 360}, 60%, 75%)`;
         }
 
         function switchTab(target) {
@@ -152,11 +167,11 @@
         function joinRoom() {
             currentRoom = document.getElementById('roomId').value;
             myName = document.getElementById('playerName').value;
-            if(!currentRoom || !myName) return alert("入力してください");
+            if(!currentRoom || !myName) return alert("入室情報を入力してください");
             socket.emit('join-room', { roomId: currentRoom, playerName: myName });
             document.getElementById('login-area').style.display = 'none';
             document.getElementById('game-area').style.display = 'flex';
-            document.getElementById('display-room').innerText = "ID: " + currentRoom;
+            document.getElementById('display-room').innerText = "ROOM: " + currentRoom;
         }
 
         function updateSettings() {
@@ -175,14 +190,14 @@
         }
 
         function startGame() {
-            if(confirm("開始しますか？")) {
-                updateSettings(); // 開始直前に最新の設定を反映
+            if(confirm("この設定で役職を配布しますか？")) {
+                updateSettings(); 
                 socket.emit('start-game', { roomId: currentRoom });
             }
         }
 
         function transferGM(id) {
-            if(confirm("譲渡しますか？")) socket.emit('transfer-gm', { roomId: currentRoom, newGmId: id });
+            if(confirm("GM権限をこのプレイヤーに渡しますか？")) socket.emit('transfer-gm', { roomId: currentRoom, newGmId: id });
         }
 
         function sendChat() {
@@ -195,15 +210,23 @@
         socket.on('update-room', (data) => {
             isGM = data.gmId === socket.id;
             document.getElementById('gm-only-area').style.display = isGM ? 'block' : 'none';
+            if(!isGM) {
+                document.getElementById('s-wolf').value = data.settings.wolf;
+                document.getElementById('s-madman').value = data.settings.madman;
+                document.getElementById('s-seer').value = data.settings.seer;
+                document.getElementById('s-hunter').value = data.settings.hunter;
+                document.getElementById('s-villager').value = data.settings.villager;
+                document.getElementById('s-know').checked = data.settings.knowEachOther;
+            }
             const list = document.getElementById('player-list');
             list.innerHTML = "";
             data.players.forEach(p => {
                 const item = document.createElement('div');
                 item.className = 'p-item';
-                const role = (isGM && p.role) ? `<span style="font-size:0.7em; color:#888;">[${p.role}]</span>` : "";
-                const gm = p.isGM ? `<span style="background:gold; color:black; font-size:0.6em; padding:1px 3px; border-radius:3px; font-weight:bold;">GM</span>` : "";
-                const btn = (isGM && !p.isGM) ? `<button class="btn btn-sub" onclick="transferGM('${p.id}')">譲渡</button>` : "";
-                item.innerHTML = `<span>${gm} <span style="color:${getNameColor(p.name)}">${p.name}</span> ${role}</span>${btn}`;
+                const role = (isGM && p.role) ? `<span style="font-size:0.75em; color:#888;">[${p.role}]</span>` : "";
+                const gm = p.isGM ? `<span style="background:gold; color:black; font-size:0.6em; padding:2px 4px; border-radius:4px; font-weight:bold; margin-right:4px;">GM</span>` : "";
+                const btn = (isGM && !p.isGM) ? `<button class="btn btn-sub" onclick="transferGM('${p.id}')">GM譲渡</button>` : "";
+                item.innerHTML = `<span>${gm}<span style="color:${getNameColor(p.name)}">${p.name}</span> ${role}</span>${btn}`;
                 list.appendChild(item);
             });
         });
@@ -211,7 +234,7 @@
         socket.on('assign-role', (data) => {
             const bar = document.getElementById('my-role-bar');
             bar.style.display = 'block';
-            bar.innerHTML = `役職: <strong>${data.role}</strong> <span style="font-size:0.8em; margin-left:5px; opacity:0.8;">${data.info || ''}</span>`;
+            bar.innerHTML = `役職: <strong>${data.role}</strong> <span style="font-size:0.85em; margin-left:8px; opacity:0.8;">${data.info || ''}</span>`;
         });
 
         socket.on('receive-chat', (data) => {
